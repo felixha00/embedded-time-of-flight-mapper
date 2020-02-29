@@ -5,15 +5,16 @@
 #include "SysTick.h"
 #include "PLL.h"
 // DEFINING FUNCTIONS 
+#define fullRot 2048
 
-void startProgram(void);
 
 int motorSteps[] = {0b1100, 0b0110, 0b0011, 0b1001};
 int motorStepsIndex;
+uint32_t stepCount;
 
 // FINITE STATE MACHINE DECLARATION
 enum events {
-		S_DISPLACEMENT,
+		START_ROTATION,
 		S_DISTANCE,
     START_LOOPING,
     PRINT_HELLO,
@@ -22,16 +23,14 @@ enum events {
 };
 
 enum states {
-		DISPLACEMENT,
-		DISTANCE,
+		ROTATING,
     START,
     LOOP,
     END,
 } state;
-
+/*
 void step_state(enum events event){
 	switch (state){
-		
 		case START:
 			switch (event){
 				case S_DISPLACEMENT:
@@ -47,36 +46,65 @@ void step_state(enum events event){
 			break;
 		}
 	}
+*/
 
+void toggleDisplacementLED(){
+	GPIO_PORTL_DATA_R ^= 0b00001000;
+	return;
+}
+void blinkDistance(){
+	GPIO_PORTF_DATA_R ^= 0b00000001;
+	SysTick_Wait10ms(10);
+	GPIO_PORTF_DATA_R ^= 0b00000001;
+	return;
+}
 
 void step(int i){
+
+		
 	GPIO_PORTM_DATA_R = motorSteps[i];
-	SysTick_Wait10ms(10);
+	SysTick_Wait10ms(1);
+	stepCount++;
+	
 	return;
 }
 
 void startMotor(void){
-	while (1){
+	toggleDisplacementLED();
+	for (int i = 0; i < fullRot; i++){
 		motorStepsIndex = (motorStepsIndex + 1)%4;
 		step(motorStepsIndex);
+		
+		if (stepCount==256){
+			blinkDistance();
+			stepCount=0;
+		}
+		
 	}
+	toggleDisplacementLED();
+	
 }
 
 
 // 
-void LEDInit(void){	
+void PF0Init(void){	
 	
-	// PF0
-	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5;		              // activate the clock for Port E
+	// PF0 Distance 
+	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5;		              // activate the clock for Port L
 	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R5) == 0){};	        // allow time for clock to stabilize
-  GPIO_PORTE_DEN_R = 0b00000001;                         		// Enabled both as digital outputs
-	GPIO_PORTE_DIR_R = 0b00000001;
-		
-	// PL3 
-	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R10;		              // activate the clock for Port E
+  GPIO_PORTF_DEN_R = 0b00000001;                         		// Enabled both as digital outputs
+	GPIO_PORTF_DIR_R = 0b00000001;
+	return;
+	}
+
+void PL3Init(void){	
+	
+
+	// PL3 Displacement
+	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R10;		              // activate the clock for Port L
 	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R10) == 0){};	        // allow time for clock to stabilize
-  GPIO_PORTE_DEN_R = 0b00001000;                         		// Enabled both as digital outputs
-	GPIO_PORTE_DIR_R = 0b00001000;
+  GPIO_PORTL_DEN_R = 0b00001000;                         		// Enabled both as digital outputs
+	GPIO_PORTL_DIR_R = 0b00001000;
 	return;
 	}
 	
@@ -85,29 +113,55 @@ void PortE_Init(void){
 	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R4) == 0){};	        // allow time for clock to stabilize
   GPIO_PORTE_DEN_R = 0b00001111;                         		// Enabled both as digital outputs
 	GPIO_PORTE_DIR_R = 0b00001111;
+	GPIO_PORTE_DATA_R = 0b00000000;       
 	return;
 	}
+
+void PortD_Init(void){	
+	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R3;		              // activate the clock for Port D
+	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R3) == 0){};	        // allow time for clock to stabilize
+  GPIO_PORTD_DIR_R = 0b00000000;       								    // make PM0 an input, PM0 is reading if the button is pressed or not 
+  GPIO_PORTD_DEN_R = 0b00001111;
+	return;
+	}
+
 
 
 void PortM_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R11;                 //activate the clock for Port M
 	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R11) == 0){};        //allow time for clock to stabilize 
-	GPIO_PORTM_DIR_R = 0b00000000;       								    // make PM0 an input, PM0 is reading if the button is pressed or not 
+	GPIO_PORTM_DIR_R = 0b00001111;       								    // make PM0 an input, PM0 is reading if the button is pressed or not 
   GPIO_PORTM_DEN_R = 0b00001111;
+	return;
+}
+
+
+void PortN_Init(void){
+	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R12;                 //activate the clock for Port N
+	while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R12) == 0){};	// LED2 - PN0, LED1 - PN1
+	GPIO_PORTN_DIR_R=0b00000011;
+	GPIO_PORTN_DEN_R=0b00000011;
 	return;
 }
 
 
 ///////////////////////////////
 int main(void){
-	LEDInit();
+	PLL_Init();
+	SysTick_Init();
+	PL3Init();
+	PF0Init();
+	PortD_Init();
 	PortE_Init();
-	PortM_Init();
+	PortM_Init(); // Motor
+	PortN_Init();
+	//step_state(START_LOOPING);
+	while (1){
 	
-	step_state(START_LOOPING);
-	
-	if (((GPIO_PORTM_DATA_R&0b00000001)==1)){ // button is pushed down
-		startProgram();
+	if((GPIO_PORTD_DATA_R&0b00000001)==0){
+		//GPIO_PORTN_DATA_R ^= 0b00000001;
+		startMotor();
+	}
+	}
 	}
 	
-}
