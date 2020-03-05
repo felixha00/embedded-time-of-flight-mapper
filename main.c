@@ -54,7 +54,7 @@ void toggleDisplacementLED(){
 }
 void blinkDistance(){
 	GPIO_PORTF_DATA_R ^= 0b00000001;
-	SysTick_Wait10ms(10);
+	SysTick_Wait10ms(3);
 	GPIO_PORTF_DATA_R ^= 0b00000001;
 	return;
 }
@@ -157,9 +157,10 @@ int main(void){
 	PortN_Init();
 	//step_state(START_LOOPING);
 	while (1){
-	
+	GPIO_PORTL_DATA_R = 0b00001000;
 	if((GPIO_PORTD_DATA_R&0b00000001)==0){
 		//GPIO_PORTN_DATA_R ^= 0b00000001;
+
 		startMotor();
 	}
 	}
