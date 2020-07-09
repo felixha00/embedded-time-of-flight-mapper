@@ -412,6 +412,26 @@
               <FileType>5</FileType>
               <FilePath>.\tm4c1294ncpdt.h</FilePath>
             </File>
+            <File>
+              <FileName>onboardLEDs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\onboardLEDs.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>VL53L1X_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\VL53L1X_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l1_platform_2dx4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\vl53l1_platform_2dx4.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

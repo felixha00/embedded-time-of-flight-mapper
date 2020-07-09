@@ -22,19 +22,51 @@ Dialog DLL:      TCM.DLL V1.36.5.0
  
 <h2>Project:</h2>
 X:\GitHub\embedded-time-of-flight-mapper\main.uvprojx
-Project File Date:  02/28/2020
+Project File Date:  04/06/2020
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Rebuild target 'Target 1'
-compiling SysTick.c...
 compiling PLL.c...
-assembling startup_msp432e401y_uvision.s...
+compiling SysTick.c...
 compiling main.c...
+uart.h(11): warning:  #1-D: last line of file ends without a newline
+  	void Status_Check(char* array, int status);
+main.c(60): warning:  #550-D: variable "myByteArray"  was set but never used
+  	uint8_t byteData, sensorState=0, myByteArray[10] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF} , i=0;
+main.c(62): warning:  #177-D: variable "ToFSensor"  was declared but never referenced
+    uint8_t ToFSensor = 1; // 0=Left, 1=Center(default), 2=Right
+main.c(64): warning:  #177-D: variable "SignalRate"  was declared but never referenced
+    uint16_t SignalRate;
+main.c(65): warning:  #177-D: variable "AmbientRate"  was declared but never referenced
+    uint16_t AmbientRate;
+main.c(66): warning:  #177-D: variable "SpadNum"  was declared but never referenced
+    uint16_t SpadNum; 
+main.c: 6 warnings, 0 errors
+compiling onboardLEDs.c...
+compiling uart.c...
+uart.h(11): warning:  #1-D: last line of file ends without a newline
+  	void Status_Check(char* array, int status);
+uart.c(72): warning:  #1-D: last line of file ends without a newline
+  	}
+uart.c: 2 warnings, 0 errors
+compiling VL53L1X_api.c...
+uart.h(11): warning:  #1-D: last line of file ends without a newline
+  	void Status_Check(char* array, int status);
+VL53L1X_api.c(272): warning:  #177-D: variable "tmp"  was declared but never referenced
+  	uint8_t tmp;
+VL53L1X_api.c: 2 warnings, 0 errors
+assembling startup_msp432e401y_uvision.s...
+compiling vl53l1_platform_2dx4.c...
+vl53l1_platform_2dx4.c(324): warning:  #167-D: argument of type "uint32_t *" is incompatible with parameter of type "uint8_t *"
+  	writeI2C(&data, 4);	
+vl53l1_platform_2dx4.c(402): warning:  #223-D: function "SysTick_Wait" declared implicitly
+      SysTick_Wait(96000);  // wait 10ms (assumes 120 MHz clock)
+vl53l1_platform_2dx4.c: 2 warnings, 0 errors
 compiling system_msp432e401y.c...
 linking...
-Program Size: Code=1368 RO-data=540 RW-data=32 ZI-data=608  
-".\Objects\main.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=4618 RO-data=658 RW-data=52 ZI-data=5732  
+".\Objects\main.axf" - 0 Error(s), 12 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -61,10 +93,10 @@ Package Vendor: TexasInstruments
 
    * Component: TexasInstruments::Device:Startup:3.2.3
       Source file:   Device\Source\startup_msp432e401y_uvision.s
+      Source file:   Examples\BlinkLED\blinkLED.c
       Source file:   Device\Source\system_msp432e401y.c
       Source file:   Examples\EmptyMain\main.c
-      Source file:   Examples\BlinkLED\blinkLED.c
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>
